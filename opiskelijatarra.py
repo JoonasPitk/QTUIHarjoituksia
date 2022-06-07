@@ -3,7 +3,6 @@
 # Libraries and modules
 # ---------------------
 
-from tabnanny import check
 from PyQt5 import QtWidgets, uic, QtPrintSupport # UI elements and ui builder
 from PyQt5.QtGui import QPainter, QTransform, QPixmap
 import os
