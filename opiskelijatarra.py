@@ -91,7 +91,6 @@ class Ui(QtWidgets.QMainWindow):
             # Close printer
             painter.end()
 
-
     # Open a file dialog to choose a picture and place it to label
     def loadPicture(self):
 
