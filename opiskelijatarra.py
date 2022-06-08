@@ -49,6 +49,7 @@ class Ui(QtWidgets.QMainWindow):
         self.settings = json.load(self.settingsFile)
         placeholderName = self.settings['placeholderName']
         self.placeholderPath.setText(placeholderName)
+        self.settingsFile.close()
 
         # Initialise controls
         self.scale.setValue(self.scaleFactor)
@@ -180,6 +181,7 @@ class Ui(QtWidgets.QMainWindow):
         settingsFile = open('studentSticker.settings', 'w',)
         self.settings['placeholderName'] = self.placeholderPath.text()
         json.dump(self.settings, settingsFile)
+        settingsFile.close()
         
 
 if __name__ == '__main__':
