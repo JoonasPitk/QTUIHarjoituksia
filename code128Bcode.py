@@ -8,11 +8,11 @@ def string2barcode(text, codeType='B', fontShift='common'):
         str: character string presentation of the barcode
     """
     startCodeList = {'A' : 103, 'B' : 104, 'C' : 105} # Value of the start symbol in different variations
-    fontPositionList = {'common' : 100, 'uncommon' : 105, 'barcodesoft' : 145} # Systems for presentingstart and stop symbols
+    fontPositionList = {'common' : 100, 'uncommon' : 105, 'barcodesoft' : 145} # Systems for presenting start and stop symbols
     addValue = fontPositionList.get(fontShift) # Get a value to shift symbols in the font
     startSymbolValue = startCodeList.get(codeType) # Choose start symbol value according to code type A, B or C
-    stopSymbolValue = 106 # Allways 106
-    stringToCode = text # A srting to be encoded into barcode
+    stopSymbolValue = 106 # Always 106
+    stringToCode = text # A string to be encoded into barcode
     cntr = 0 # Se counter to 0
     weightedSum = startSymbolValue # Add the value of the start symbol to weighted value
 

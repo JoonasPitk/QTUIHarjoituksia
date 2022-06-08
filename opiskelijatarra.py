@@ -3,11 +3,12 @@
 # Libraries and modules
 # ---------------------
 
-from PyQt5 import QtWidgets, uic, QtPrintSupport # UI elements and ui builder
-from PyQt5.QtGui import QPainter, QTransform, QPixmap
-import os
+from PyQt5 import QtWidgets, uic, QtPrintSupport # UI elements, ui builder, and printing tools
+from PyQt5.QtGui import QPainter, QTransform, QPixmap # For printing, scaling, and showing pictures
+import json
+import os # For path processing
 import sys # For accessing system parameters
-import code128Bcode
+import code128Bcode # For creating barcodes with Libre Code 128
 
 # Class definitions
 # -----------------
@@ -21,18 +22,51 @@ class Ui(QtWidgets.QMainWindow):
         # Load the UI definition file
         uic.loadUi('opiskelijatarra.ui', self)
 
+        # DATA VALUES
+
+        # Settings
+
+        # Initial values
+        self.rawPhoto = QPixmap('placeholder.png')
+        self.scaleFactor = 100
+        self.horizontalShift = 120
+        self.verticalShift = 160
+
+        
         # CONTROLS
         self.firstNameInput = self.studentFirstNameLineEdit # Direct assign
-        self.lastNameInput = self.findChild(QtWidgets.QLineEdit,'studentLastNameLineEdit') # Pointer assingn
+        self.lastNameInput = self.findChild(QtWidgets.QLineEdit,'studentLastNameLineEdit') # Pointer assignment
         self.numberInput = self.studentNumberLineEdit
+        self.horizontalMove = self.moveHorizontalSlider
+        self.verticalMove = self.moveVerticalSlider
+        self.scale = self.sizeDial
 
+        # Settings controls
+        self.placeholderPath = self.settingsPicturePathLineEdit
+
+        # Read initial values from settings file
+        self.settingsFile = open('studentSticker.settings', 'r',)
+        self.settings = json.load(self.settingsFile)
+        placeholderName = self.settings['placeholderName']
+        self.placeholderPath.setText(placeholderName)
+
+        # Initialise controls
+        self.scale.setValue(self.scaleFactor)
+
+        
         # INDICATORS
         self.nameOutput = self.stickerNameLabel
         self.nameOutput.setText('') # Clear it before use
         self.studentNumberOutput = self.stickerStudentNumberLabel
         self.studentNumberOutput.setText('')
+        self.studentPhoto = self.pictureLabel
+        self.scaleIndicator = self.scaleValueLabel
+
+        # Initialise indicators
+        self.scaleIndicator.setText(str(self.scaleFactor))
 
         # TODO: Disable print button until all fields are populated.
+
 
         # SIGNALS
 
@@ -48,6 +82,12 @@ class Ui(QtWidgets.QMainWindow):
 
         # Signal when student number has been changed
         self.numberInput.textChanged.connect(self.updateBarcode)
+
+        # Signal when scale changes
+        self.scale.valueChanged.connect(self.updatePicture)
+
+        # Save settings to a json file
+        self.saveSettingsPushButton.clicked.connect(self.saveSettings)
 
 
         # SHOW THE UI
@@ -90,6 +130,7 @@ class Ui(QtWidgets.QMainWindow):
             # Close printer
             painter.end()
 
+
     # Open a file dialog to choose a picture and place it to label
     def loadPicture(self):
 
@@ -105,7 +146,11 @@ class Ui(QtWidgets.QMainWindow):
             absoluteWorkingDirectory,
             'Kuvatiedostot (*.jpg *.png)',
         )
-        # TODO: Make this ready tomorrow!
+        
+        # If user selects a file, create a pixmap
+        if fileName:
+            self.rawPhoto = QPixmap(fileName)
+            self.studentPhoto.setPixmap(self.rawPhoto)
 
 
     # Concatenates first and last name and updates the sticker
@@ -119,6 +164,23 @@ class Ui(QtWidgets.QMainWindow):
         bcode = code128Bcode.string2barcode(self.numberInput.text())
         self.studentNumberOutput.setText(bcode)
 
+    # Resize and move the picture in the picture label
+    def updatePicture(self):
+        # Transform to fit the picture in the label
+        self.scaleFactor = self.scale.value()
+        transformation = QTransform() # Create transformation object
+        scaleFactor = self.scaleFactor / 100
+        transformation.scale(scaleFactor, scaleFactor) # Set the scale according to scalefactror
+        # TODO: Make tools for moving the picture
+        adjustedPhoto = self.rawPhoto.transformed(transformation) # Apply the transformation to the sticker
+        self.studentPhoto.setPixmap(adjustedPhoto)
+
+
+    def saveSettings(self):
+        settingsFile = open('studentSticker.settings', 'w',)
+        self.settings['placeholderName'] = self.placeholderPath.text()
+        json.dump(self.settings, settingsFile)
+        
 
 if __name__ == '__main__':
 
