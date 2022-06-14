@@ -1,2 +1,2 @@
 # QtUIharjoituksia
-Työpöytäsovellusten luominen QT Designer -ohjelmalla ja Python-kielellä.
+Työpöytäsovellusten luominen Qt Designer -ohjelmalla ja Python-kielellä.
